@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0d12">
+<title>MUSICLAB — Mobile DAW</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><b>MUSICLAB</b><span> MOBILE DAW</span></div>
+  <div class="transport">
+    <button id="record" class="danger">● Record</button>
+    <button id="play">▶ Play</button>
+    <button id="stop">■ Stop</button>
+    <button id="loop">↻ Loop</button>
+    <span id="time">00:00.0</span>
+  </div>
+  <label class="bpm">BPM <input id="bpm" type="number" value="120" min="40" max="240"></label>
+</header>
+
+<main>
+<aside class="sidebar">
+  <h3>PROJECT</h3>
+  <button id="beatBtn">Import Beat</button><input id="beatFile" type="file" accept="audio/*" hidden>
+  <button id="vocalBtn">Import Vocal</button><input id="vocalFile" type="file" accept="audio/*" hidden>
+  <button id="mic">🎙 Enable Mic</button>
+  <label class="toggle"><input id="monitor" type="checkbox"> Hear my vocal</label>
+  <label class="toggle"><input id="beatMonitor" type="checkbox" checked> Beat monitor</label>
+  <div id="recordState" class="status">Mic off</div>
+
+  <h3>PRESETS</h3>
+  <select id="preset">
+    <option value="">Choose preset…</option>
+    <option>Clean Vocal</option><option>Modern Pop</option><option>Afro Vocal</option>
+    <option>Warm R&B</option><option>Telephone</option><option>Bright Lead</option>
+    <option>Wide Delay</option><option>Vocal Air</option><option>Dark Rap</option>
+  </select>
+  <button id="applyPreset">Apply Preset</button>
+
+  <h3>AI ASSISTANT</h3>
+  <textarea id="ai" placeholder="Example: make the vocal brighter, compress it, add 20% echo and 15% reverb."></textarea>
+  <button id="runAI">Apply to Track</button>
+  <div id="aiStatus" class="status">Ready.</div>
+
+  <h3>EXPORT</h3>
+  <button id="export">Render & Export WAV</button>
+  <a id="download" hidden>⬇ Download mix</a>
+</aside>
+
+<section class="workspace">
+  <div class="ruler" id="ruler"></div>
+  <div class="track">
+    <div class="trackHead"><b>BEAT</b><span id="beatState">empty</span><div><button data-mute="beat">M</button><button data-solo="beat">S</button></div></div>
+    <div class="lane"><div id="beatClip" class="clip">Beat</div></div>
+  </div>
+  <div class="track">
+    <div class="trackHead"><b>VOCAL</b><span id="vocalState">empty</span><div><button data-mute="vocal">M</button><button data-solo="vocal">S</button></div></div>
+    <div class="lane"><div id="vocalClip" class="clip vocal">Vocal</div></div>
+  </div>
+  <div class="automation">
+    <div class="autoTitle"><b>AUTOMATION</b><span>Real-time parameter automation</span></div>
+    <select id="autoParam">
+      <option value="gain">Vocal gain</option><option value="delay">Echo</option><option value="reverb">Reverb</option>
+      <option value="low">Low EQ</option><option value="mid">Mid EQ</option><option value="high">High EQ</option>
+      <option value="sat">Saturation</option><option value="tune">Pitch correction</option>
+    </select>
+    <input id="autoStart" type="number" value="0" min="0" step=".1" aria-label="start">
+    <input id="autoEnd" type="number" value="10" min=".1" step=".1" aria-label="end">
+    <input id="autoFrom" type="number" value="1" step=".05" aria-label="from">
+    <input id="autoTo" type="number" value=".5" step=".05" aria-label="to">
+    <button id="addAuto">Add automation</button>
+    <div id="autoList"></div>
+  </div>
+</section>
+
+<aside class="mixer">
+  <h3>VOCAL FX</h3>
+  <div class="knob"><label>Gain <output id="gainOut">1.00</output></label><input id="gain" type="range" min="0" max="2" step=".01" value="1"></div>
+  <div class="knob"><label>Noise Gate <output id="gateOut">-48 dB</output></label><input id="gate" type="range" min="-80" max="-10" value="-48"></div>
+  <div class="knob"><label>Low EQ <output id="lowOut">0 dB</output></label><input id="low" type="range" min="-18" max="18" value="0"></div>
+  <div class="knob"><label>Mid EQ <output id="midOut">0 dB</output></label><input id="mid" type="range" min="-18" max="18" value="0"></div>
+  <div class="knob"><label>High EQ <output id="highOut">0 dB</output></label><input id="high" type="range" min="-18" max="18" value="0"></div>
+  <div class="knob"><label>Compression <output id="compOut">2:1</output></label><input id="comp" type="range" min="1" max="12" step=".1" value="2"></div>
+  <div class="knob"><label>Saturation <output id="satOut">0%</output></label><input id="sat" type="range" min="0" max="100" value="0"></div>
+  <div class="knob"><label>Echo <output id="delayOut">0%</output></label><input id="delay" type="range" min="0" max="80" value="0"></div>
+  <div class="knob"><label>Reverb <output id="reverbOut">0%</output></label><input id="reverb" type="range" min="0" max="80" value="0"></div>
+
+  <h3>PITCH</h3>
+  <div class="knob"><label>Pitch Correction <output id="tuneOut">0%</output></label><input id="tune" type="range" min="0" max="100" value="0"></div>
+  <div class="row">
+    <label>Key <select id="key"><option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option><option>F#</option><option>G</option><option>G#</option><option>A</option><option>A#</option><option>B</option></select></label>
+    <label>Scale <select id="scale"><option>Chromatic</option><option>Major</option><option>Minor</option></select></label>
+  </div>
+  <div class="knob"><label>Humanize <output id="humanOut">0%</output></label><input id="human" type="range" min="0" max="100" value="0"></div>
+  <div class="pitchInfo" id="pitchInfo">Pitch engine: average-pitch correction preview. Humanize blends correction toward the original performance.</div>
+
+  <h3>MASTER</h3>
+  <div class="knob"><label>Master <output id="masterOut">100%</output></label><input id="master" type="range" min="0" max="120" value="100"></div>
+  <div class="meter"><div id="meterFill"></div></div>
+</aside>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
